@@ -5,6 +5,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from rest_framework import viewsets, permissions
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 
 from .serializers import*
 from .models import *
@@ -268,3 +271,18 @@ class ServiceViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticated]
 
 
+class SubscriptionView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, id=None):
+        subscription_obj = Subscription.objects.filter(payment_status__in = ['success', 'failed']).order_by('-date')
+        if request.user.is_superuser:
+            if id is not None:
+                subscription_obj = subscription_obj.filter(id = id)
+        else:
+            subscription_obj = subscription_obj.filter(user = request.user)
+            if id is not None:
+                subscription_obj = subscription_obj.filter(id = id, user = request.user)
+        serializer = SubscriptionSerializer(subscription_obj, many=True)
+        return Response(serializer.data)
+    

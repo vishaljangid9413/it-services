@@ -16,6 +16,10 @@ urlpatterns = [
     path('checkout/<int:id>/', checkout_page, name="checkout-page"),
     path('thank-you/', thank_you_page, name="thank-you-page"),
     path('subscriptions/', subscription_page, name="subscription-page"),
+
+    # ** Api **
+    path('api/subscriptions/', SubscriptionView.as_view(), name="subscription-api"),
+    path('api/subscriptions/<int:id>/', SubscriptionView.as_view(), name="subscription-api"),
 ]
 
 router.register(r'api/services', ServiceViewSet)
