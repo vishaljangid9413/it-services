@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% if messages %}
+    <div class="position-fixed top-25 w-100" style="z-index:99;">
+        {% for message in messages %}
+            {% if message.tags == "success" %}
+            <div class="alert alert-success alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Well Done!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% elif message.tags == "error" %}
+            <div class="alert alert-danger alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Oops!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+<div id="home" class="container card my-4 p-4">
+        <div class="heading d-flex flex-row justify-content-between" style="align-items:center;">
+            <div class="d-flex flex-row justify-content-between" style="align-items:center;width:40rem">
+                <input type="text" id="search_input" class="form-control" placeholder="Search Service" style="width:23rem">
+                <button type="button" class="btn btn-primary" id="search_button" style="width:7rem">Search</button>
+                <a href="/"  class="btn btn-secondary"  style="width:8rem">Clear Search</a>
+            </div>
+        {% if request.user.is_superuser %}
+        <a href="/service/create/" class="btn btn-warning" >Create Service</a>
+        {% endif %}
+    </div>
+
+    {% if page_obj %}
+
+        <div id="service-cards" class="cards d-flex flex-row mt-3 " style="align-item:center; flex-wrap:wrap;"  >
+            {% for service in page_obj %}
+                <a href="{% url 'service-page' id=service.id  %}" class="card m-4 position-relative" style="width: 23rem;text-decoration:none;">
+                    {% if request.user.is_superuser %}
+                        {% if service.is_active %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success p-2">Active</span>
+                        {% else %}
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger p-2">In-Active</span>
+                        {% endif %}
+                    {% endif %}
+
+                    <img 
+                    {% if service.image %}
+                        src="{{service.image.url}}" 
+                    {% endif %}
+                    class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">{{service.name}}</h5>
+                        <p class="card-text">Price: {{service.price}}/-</p>
+
+                        {% comment %} <input type="text" class="d-none" id="service_id" value={{service.id}}>
+                        {% csrf_token %}
+                        <button id="" type="button" class="btn btn-primary">Buy Now</button>
+                        <div class="d-flex flex-row justify-content-between mt-4">
+                            <button id="update-service" type="button" class="btn btn-secondary">Update Service</button>
+                            <button id="delete-service" type="button" class="btn btn-danger ">Delete</button>
+                        </div> {% endcomment %}
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+
+        <nav id="data_pagination">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <span class="page-link">
+                        <a  href="?page=1" tabindex="-1" style="text-decoration:none;">previous</a>
+                    </span>
+                {% endif %}
+                    <span class="page-link text-secondary" >
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+                {% if page_obj.has_next %}
+                    <span class="page-link">
+                        <a href="?page={{ page_obj.next_page_number }}" style="text-decoration:none;">next</a>
+                    </span>
+                {% endif %}
+            </ul>
+        </nav>
+    {% else %}
+        <h1>No Service Available</h>
+    {% endif %}
+</div>
+
+
+{% endblock content %}

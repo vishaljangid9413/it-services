@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+{% comment %} TODO SUCCESS MESSAGE  {% endcomment %}
+
+{% if messages %}
+    <div class="position-fixed top-25 w-100">
+        {% for message in messages %}
+            {% if message.tags == "success" %}
+            <div class="alert alert-success alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Well Done!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% elif message.tags == "error" %}
+            <div class="alert alert-danger alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Oops!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+<div class="my_form  py-5">
+    <div class="form-cont">        
+
+        <div class="form-box">
+            <form class="form-block" action="{% url 'user-login-form' %}" method="post"  >
+                {% csrf_token %}                    
+                <div class="form-group">
+                    <input type="text" name="mobile" minlength="10" maxlength="10" class="form-fields " required="" id="id_mobile" value="{{mobile}}" placeholder="Mobile Number"  pattern="[6-9][0-9]*" title="Please enter a 10-digit mobile number, starting with 6, 7, 8, or 9">
+                </div>
+                <div class="form-group mt-3">
+                    <div class="password-field">
+                        <input type="password" name="password" minlength="8" maxlength="20" class="form-fields " required="" id="id_password" placeholder="Password">
+                    </div>
+                </div>
+                
+                <div class="button">
+                    <button name="login_submit" type="submit" value="Log In" class="btn btn-lg btn-primary" data-loading-text="Logging in...">Log In</button>
+                </div>
+            </form>
+            <div class="sign-up">
+                <p>Don't have an account?<a href="/register/">Sign Up</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}

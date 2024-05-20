@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% if messages %}
+    <div class="position-fixed top-25 w-250">
+        {% for message in messages %}
+            {% if message.tags == "success" %}
+            <div class="alert alert-success alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Well Done!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% elif message.tags == "error" %}
+            <div class="alert alert-danger alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Oops!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+    
+<div class="my_form  py-5">
+    <div class="form-cont"> 
+        <h2 style="d-block;text-align:center;font-weight:800;color:#717171;">Create Service</h2>
+       
+        <div class="form-box">
+            <form class="form-block" method="post"  action="{% url 'create-service' %}" enctype="multipart/form-data">
+                {% csrf_token %}     
+                {% for fo in form %}
+                    {% if fo.name == "name" %}
+                        <div class="form-group mt-3" >
+                            <input type="text" name="name" maxlength="50" class="form-fields " required="" id="id_name" placeholder="Service Name">
+                        </div> 
+                        {{fo.errors}}
+                    {% elif fo.name == "image" %}
+                        <div class="form-group mt-3" >
+                            <input type="file" name="image" accept="image/*" class="form-fields " required="" id="id_image" >
+                        </div> 
+                        {{fo.errors}}
+                    {% elif fo.name == "payment_terms" %}
+                        <div class="form-group mt-3" >
+                            <textarea name="payment_terms" class="form-fields" required id="id_payment_terms" placeholder="Payment Terms" rows="50" style="height:11rem"></textarea>
+                        </div> 
+                        {{fo.errors}}
+                    {% elif fo.name == "price" %}
+                        <div class="form-group mt-3" >
+                            <input type="number" name="price" required=""  class="form-fields " id="id_price" placeholder="Price">
+                        </div> 
+                        {{fo.errors}}
+                    {% elif fo.name == "tax" %}
+                        <div class="form-group mt-3" >
+                            <input type="number" name="tax" step="any"  class="form-fields " required="" id="id_tax" placeholder="Tax">
+                        </div> 
+                        {{fo.errors}}
+                    {% elif fo.name == "package" %}
+                        <div class="form-group mt-3">
+                            <select name="package" class="form-fields" id="id_package">
+                                {% for choice in fo.field.choices %}
+                                    <option value="{{ choice.0 }}" {% if choice.0 == fo.value %}selected{% endif %}>{{ choice.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {{ fo.errors }}
+                    {% elif fo.name == "is_active" %}
+                        <div class="form-group mt-3" style="width:100%;display:flex;flex-direction:row !important;">
+                            <input type="checkbox" name="is_active" class="form-fields"  style="width:2rem;" id="id_is_active" {% if fo.value %}checked{% endif %}>
+                            <label for="id_is_active" style="width:16rem;padding-left:1rem">Active/In-Active</lable>
+                        </div>
+                        {{ fo.errors }}
+                    {% endif %}
+                {% endfor %}
+                <div class="button">
+                    <button name="register_form" type="submit" value="Register" class="btn btn-primary btn-lg" data-loading-text="Submitting...">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> 
+{% endblock content %}

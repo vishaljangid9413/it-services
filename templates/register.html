@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+{% comment %} TODO SUCCESS MESSAGE  {% endcomment %}
+
+    
+{% if messages %}
+    <div class="position-fixed top-25 w-100">
+        {% for message in messages %}
+            {% if message.tags == "success" %}
+            <div class="alert alert-success alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Well Done!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% elif message.tags == "error" %}
+            <div class="alert alert-danger alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Oops!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+<div class="my_form  py-5">
+    <div class="form-cont">        
+        <div class="form-box">
+            <form class="form-block" method="post"  action="{% url 'user-register-form' %}" >
+                {% csrf_token %}     
+                {% for fo in form %}
+                    {% if fo.name == "fullname" %}
+                        <div class="form-group mt-3" >
+                            <input type="text" name="fullname" maxlength="50" class="form-fields " required="" id="id_fullname"  value="{% if fo.value %}{{fo.value}}{% endif %}" placeholder="Full Name">
+                        </div> 
+                        {{fo.errors}}
+                    {% elif fo.name == "email" %}
+                        <div class="d-flex flex-row mt-3" style="justify-content:space-between;">
+                            <div class="form-group" style="width:70%;">
+                                <input type="email" name="email" maxlength="30" class="form-fields " required="" id="id_email" value="{% if fo.value %}{{fo.value}}{% endif %}" placeholder="Email">
+                                <div id="timer" style="font-size:0.7rem;"></div>
+                            </div> 
+                            <div id="get-otp" class="form-group button ml-2" style="width:27%;margin-top:0vw;justify-content:unset;">
+                                <button id="get_otp-button" type="button"  class="btn btn-primary"  data-loading-text="Submitting...">Get OTP</button>
+                            </div>
+                            <div id="otp-field" class="form-group  d-none ml-2" style="width:27%;margin-top:0vw;">
+                                <input type="text" name="otp" minlength="6" maxlength="6" class="form-fields" required id="id_otp" placeholder="OTP" pattern="\d*" title="Please enter a 6-digit number OTP">
+                            </div> 
+                        </div>
+                        {{fo.errors}}
+                    {% elif fo.name == "mobile" %}
+                        <div class="form-group mt-3">
+                            <input type="text" name="mobile" minlength="10" maxlength="10" class="form-fields " required="" id="id_mobile" value="{% if fo.value %}{{fo.value}}{% endif %}" placeholder="Mobile Number" pattern="[6-9][0-9]*" title="Please enter a 10-digit mobile number, starting with 6, 7, 8, or 9">
+                        </div> 
+                        {{fo.errors}}
+                    {% elif fo.name == "address" %}
+                        <div class="form-group  mt-3">
+                            <input type="text" name="address" maxlength="50" class="form-fields " required="" id="id_address"  value="{% if fo.value %}{{fo.value}}{% endif %}" placeholder="address">
+                        </div> 
+                        {{fo.errors}}
+                    {% elif fo.name == "password" %}    
+                        <div class="form-group mt-3">
+                            <div class="password-field">
+                                <input type="password" name="password" minlength="8" maxlength="20" class="form-fields " value="{% if fo.value %}{{fo.value}}{% endif %}" required="" id="id_password" placeholder="Password">
+                                <span class="fa fa-eye-slash"></span>
+                            </div>
+                        </div> 
+                        {{fo.errors}}
+                    {% endif %}
+                {% endfor %}
+                <div class="button">
+                    <button name="register_form" type="submit" value="Register" class="btn btn-primary btn-lg" data-loading-text="Submitting...">Submit</button>
+                </div>
+            </form>
+            {% if not request.user.is_authenticated %}
+                <div class="sign-up">
+                    <p>Already have an account?<a href="/login/">login</a></p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>  
+{% endblock content %}

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+
+{% if messages %}
+    <div class="position-fixed top-25 w-100">
+        {% for message in messages %}
+            {% if message.tags == "success" %}
+            <div class="alert alert-success alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Well Done!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% elif message.tags == "error" %}
+            <div class="alert alert-danger alert-dismissible fade show  w-75 mx-auto " role="alert" style="z-index:999;">
+                    <strong>Oops!</strong> {{message|linebreaks}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div id="subsciption" class="container card  my-4 p-4"  >
+    <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">Image</th>
+            <th scope="col">Service Name</th>
+            {% if request.user.is_superuser %}
+                <th scope="col">User</th>
+            {% endif %}
+            <th scope="col">Status</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Date</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for item in page_obj %}
+                <tr>
+                    <th scope="row">
+                        {% if item.service %}
+                            <a  href="{% url 'service-page' id=item.service.id  %}" tabindex="-1" style="text-decoration:none;">
+                                <img 
+                                {% if item.service.image %}
+                                    src="{{item.service.image.url}}" 
+                                {% endif %}
+                                class="card-img-top" 
+                                style="width:7rem;height:4rem;"
+                                alt="...">
+                            </a>
+                        {% else %}
+                         Removed
+                        {% endif %}
+                    </th>
+                    <td>
+                        {% if item.service %}
+                            <a href="{% url 'service-page' id=item.service.id  %}" tabindex="-1" style="text-decoration:none;">{{item.service.name}}</a>
+                        {% else %}
+                         Removed
+                        {% endif %}
+                    </td>
+                    {% if request.user.is_superuser %}
+                        <td>{{item.user.email}}</td>
+                    {% endif %}
+                    <td>{{item.payment_status}}</td>
+                    <td>{{item.amount}}/-</td>
+                    <td>{{item.date}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+      <nav id="data_pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <span class="page-link">
+                    <a  href="?page=1" tabindex="-1" style="text-decoration:none;">previous</a>
+                </span>
+            {% endif %}
+                <span class="page-link text-secondary" >
+                    Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                </span>
+            {% if page_obj.has_next %}
+                <span class="page-link">
+                    <a href="?page={{ page_obj.next_page_number }}" style="text-decoration:none;">next</a>
+                </span>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+
+{% endblock content %}
