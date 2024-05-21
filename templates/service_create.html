@@ -25,7 +25,7 @@
         <h2 style="d-block;text-align:center;font-weight:800;color:#717171;">Create Service</h2>
        
         <div class="form-box">
-            <form class="form-block" method="post"  action="{% url 'create-service' %}" enctype="multipart/form-data">
+            <form class="form-block" method="post"  action="{% url 'create-service-form' %}" enctype="multipart/form-data">
                 {% csrf_token %}     
                 {% for fo in form %}
                     {% if fo.name == "name" %}

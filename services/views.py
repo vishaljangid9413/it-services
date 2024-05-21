@@ -94,15 +94,17 @@ def service_create_form(request):
     try:
         if not request.user.is_superuser or request.method != 'POST':
             raise ValueError('Creation Failed')
-
+        print("FIRST CHECK::")
         form = ServiceForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save(commit=False)
+            form.save()
             messages.success(request, "Service Created Successfully")
+            print("SECOND CHECK::")
             return redirect("/")
         else:
             raise ValueError(form.errors)
     except Exception as e:
+        print(str(e), traceback.format_exc())
         messages.error(request, str(e))
         form = ServiceForm(initial={
             'name': name, 
@@ -152,7 +154,7 @@ def service_update_form(request, id):
 
         form = ServiceForm(request.POST, request.FILES, instance=service)
         if form.is_valid():
-            form.save(commit=False)
+            form.save()
             messages.success(request, "Service updated Successfully")
             return redirect(f"/service/{id}/")
         else:
@@ -268,7 +270,12 @@ def thank_you_page(request):
 class ServiceViewSet(viewsets.ModelViewSet):
     queryset = Service.objects.all()
     serializer_class = ServiceSerializer
-    permission_classes = [permissions.IsAdminUser, permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['create', 'destroy', 'update', 'partial_update']:
+            return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
+        return super().get_permissions()
 
 
 class SubscriptionView(APIView):

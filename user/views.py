@@ -47,12 +47,12 @@ def registeration_form(request):
             return redirect('/login/')
 
         # verify otp 
-        OTPHandler.verifyOTP(email, "registration", otp)
+        OTPHandler.verifyOTP(email, otp)
         
         # Create new user
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
+            user = form.save()
             user.set_password(password)
             user.save()
         else:
@@ -120,7 +120,7 @@ class GetOTP(APIView):
 class UserRegistration(APIView):
     def post(self, request):
         data = request.data
-        print(data.get('email'), "registration", data.get('otp'))
+        print(data.get('email'), data.get('otp'))
         try:
             OTPHandler.verifyOTP(data.get('email'), data.get('otp'))
         except Exception as e:
@@ -164,6 +164,7 @@ class ForgetPasswordView(APIView):
             user = User.objects.filter(mobile = mobile).first()
             if not user:
                 raise ValueError("User not found")
+            
             elif user.check_password(password):
                 raise ValueError('Password must not be same as Old Password')
 
@@ -186,7 +187,6 @@ class LogoutView(APIView):
         except Token.DoesNotExist:
             return Response({'error': 'Token not found'}, status=status.HTTP_404_NOT_FOUND)        
         token.delete()                
-        # request.session.flush()
         return Response({'success': 'Logout successful'})   
     
 
@@ -196,18 +196,30 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
-        if self.action in ['create', 'destroy']:
+        # Nobody have the rights to delete user profile else Admin
+        if self.action in ['destroy']:
             return [permissions.IsAuthenticated(), permissions.IsAdminUser()]
         return super().get_permissions()
 
     def update(self, request, *args, **kwargs):
         user = self.get_object()
+
+        # only admin and user have the rights to update profile
         if not request.user.is_superuser and user != request.user:
-            return Response({'error': 'Permission Denied'},
-                            status=status.HTTP_403_FORBIDDEN)
+            return Response({'error': 'Permission Denied'}, status=status.HTTP_403_FORBIDDEN)
+
+        # only user can change his password, even admin doesn't have permission to do this action 
+        if 'password' in request.data and user != request.user:
+            return Response({'error': 'Cannot change password for another user'}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = self.get_serializer(user, data=request.data, partial=kwargs.get('partial', False))
         if serializer.is_valid():
             self.perform_update(serializer)
+            if 'password' in request.data:
+                # set hashed password 
+                user.set_password(request.data['password'])
+                user.save()
+
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({'error':str(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
@@ -216,3 +228,6 @@ class UserViewSet(viewsets.ModelViewSet):
         kwargs['partial'] = True
         return self.update(request, *args, **kwargs)
 
+    def create(self, request, *args, **kwargs):
+        return Response({'error': 'Method Not Allowed, Please use Registration API'}, status=status.HTTP_403_FORBIDDEN)
+    

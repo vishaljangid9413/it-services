@@ -11,6 +11,8 @@ class OTPHandler:
     def generate_otp(email):
         # Generate 6-digit OTP
         otp = get_random_string(length=6, allowed_chars='1234567890')
+        if not isValidEmail(email):
+            raise ValueError("Invalid Email")
         sendEmailOTP(email, otp, "registration")
         return {'OTP': otp}
 

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
+{% load custom_tags %}
+
 
 {% block content %}
 {% if messages %}
@@ -51,7 +53,7 @@
                     class="card-img-top" alt="...">
                     <div class="card-body">
                         <h5 class="card-title">{{service.name}}</h5>
-                        <p class="card-text">Price: {{service.price}}/-</p>
+                        <p class="card-text">Price: {{service.price|apply_tax:service.tax}}/-</p>
 
                         {% comment %} <input type="text" class="d-none" id="service_id" value={{service.id}}>
                         {% csrf_token %}
