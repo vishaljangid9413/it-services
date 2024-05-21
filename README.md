@@ -38,7 +38,12 @@ The IT Services is a web application built with Django and Django REST Framework
     python manage.py runserver
     ```
 
-6. Access the application in your web browser at [http://localhost:8000](http://localhost:8000).
+6. Create a Superuser Account to access admin panel:
+    ```bash
+    python manage.py createsuperuser
+    ```
+
+7. Access the application in your web browser at [http://localhost:8000](http://localhost:8000).
 
 ## Dependencies
 
